@@ -4,9 +4,9 @@
 
 使用 Python 包管理器 pip 安装项目依赖
 
-安装 *xml*：
+安装 *lxml*：
 
-	pip install xml
+	pip install lxml
 
 安装 *OpenSSL*：
 
