@@ -6,6 +6,8 @@
 
 安装 *lxml*：
 
+	sudo apt-get build-dep libxml2-dev libxslt-dev python-dev
+
 	pip install lxml
 
 安装 *OpenSSL*：
