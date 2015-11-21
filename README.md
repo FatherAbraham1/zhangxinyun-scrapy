@@ -4,13 +4,19 @@
 
 使用 Python 包管理器 pip 安装项目依赖
 
+安装开发依赖
+
+	sudo apt-get build-essetial python-dev
+
 安装 *lxml*：
 
-	sudo apt-get build-dep libxml2-dev libxslt-dev python-dev
+	sudo apt-get install libxml2-dev libxslt-dev
 
 	pip install lxml
 
 安装 *OpenSSL*：
+
+	sudo apt-get install libssl-dev libffi-dev
 
 	pip install pyopenssl
 
