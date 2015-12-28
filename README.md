@@ -6,7 +6,7 @@
 
 安装开发依赖
 
-	sudo apt-get build-essetial python-dev
+	sudo apt-get install build-essential python-dev
 
 安装 *lxml*：
 
