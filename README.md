@@ -1,39 +1,66 @@
 # 毕业设计之网络爬虫
 
-## 安装依赖
+## 部署环境
 
-使用 Python 包管理器 pip 安装项目依赖
+操作系统：Ubuntu 14.04
+
+Python 版本：Python 2.7
+
+
+## 安装依赖
 
 安装开发依赖
 
 	sudo apt-get install build-essential python-dev
 
-安装 *lxml*：
+安装 *lxml* 依赖：
 
 	sudo apt-get install libxml2-dev libxslt-dev
 
-	pip install lxml
-
-安装 *OpenSSL*：
+安装 *OpenSSL* 依赖：
 
 	sudo apt-get install libssl-dev libffi-dev
 
-	pip install pyopenssl
+安装 Python 包管理器 *pip*：
 
-安装 *Scrapy*：
+	weget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
+	
+安装 Python 虚拟环境 *virtualenv*
 
-	pip install scrapy
+	pip install virtualenv
 
-安装 *BeautifulSoup*
+## 运行 Scrapyd
 
-	pip install beautifulsoup4
+创建目录 *scrapyd*
 
-安装 *mysql-connector-python*
+	mkdir scrapyd && cd scrapyd
 
-	pip install --allow-external mysql-connector-python mysql-connector-python
+创建并启动 Python 虚拟环境
 
-## 运行
+	virtualenv venv && source venv/bin/activeate
+	
+安装 scrapyd
 
-运行爬虫：
+	pip install lxml, pyopenssl, scrapyd
 
-	scrapy crawl <spider>
+启动 scrapyd
+
+	scrapyd
+
+## 应用部署
+
+克隆最新的代码到本地
+
+	git clone https://github.com/zhangxinyun/zhangxinyun-scrapy.git && cd zhangxinyun-scrapy
+	
+创建并启动 Python 虚拟环境
+
+	virtualenv venv && source venv/bin/activeate
+
+安装项目依赖
+
+	pip install -r requirements.txt
+	
+部署项目到 scrapyd
+
+	pip install scrapyd-client && scrapyd-deploy -p zhangxinyun_scrapy
