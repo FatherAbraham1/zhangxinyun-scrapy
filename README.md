@@ -41,7 +41,7 @@ Python 版本：Python 2.7
 	
 安装 scrapyd
 
-	pip install lxml, pyopenssl, scrapyd
+	pip install lxml pyopenssl scrapyd
 
 启动 scrapyd
 
