@@ -23,11 +23,11 @@ Python 版本：Python 2.7
 
 安装 Python 包管理器 *pip*：
 
-	weget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
+	wget https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
 	
 安装 Python 虚拟环境 *virtualenv*
 
-	pip install virtualenv
+	sudo pip install virtualenv
 
 ## 运行 Scrapyd
 
