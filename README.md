@@ -37,7 +37,7 @@ Python 版本：Python 2.7
 
 创建并启动 Python 虚拟环境
 
-	virtualenv venv && source venv/bin/activeate
+	virtualenv venv && source venv/bin/activate
 	
 安装 scrapyd
 
