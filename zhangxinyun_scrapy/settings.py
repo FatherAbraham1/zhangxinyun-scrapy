@@ -61,10 +61,9 @@ NEWSPIDER_MODULE = 'zhangxinyun_scrapy.spiders'
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'zhangxinyun_scrapy.pipelines.ReduceNoisePipeline': 300,
-#    'zhangxinyun_scrapy.pipelines.PersistentPipline': 500
-#}
+ITEM_PIPELINES = {
+   'zhangxinyun_scrapy.pipelines.SparkPipline': 300
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -84,3 +83,7 @@ NEWSPIDER_MODULE = 'zhangxinyun_scrapy.spiders'
 #HTTPCACHE_DIR='httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Custom Settings
+HADOOP_NAMENODE_HOST=''
+HADOOP_NAMENODE_PORT=50070

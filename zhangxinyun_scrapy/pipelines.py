@@ -4,53 +4,46 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import tempfile
+import subprocess
 
-from bs4 import BeautifulSoup
-import mysql.connector
-import uuid
-import re
+import requests
 
-class ReduceNoisePipeline(object):
+class SparkPipline(object):
 
-    def process_item(self, item, spider):
-        content = item['content']
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings = crawler.settings
+        host = settings['HADOOP_NAMENODE_HOST']
+        port = settings['HADOOP_NAMENODE_PORT']
 
-        soup = BeautifulSoup(content)
-        content = soup.get_text()
-        if content:
-            pattern = re.compile('\s+')
-            content = re.sub(pattern, '', content)
-            print content
-            item['content'] = content
-            return item
-        else:
-            raise DropItem("Missing content in %s" % item)
+        return cls(host, port)
 
-class PersistentPipline(object):
-
-    def __init__(self):
-        self.database_config = {
-            'host': '192.168.1.104',
-            'user': 'lizhen',
-            'password': '1',
-            'database': 'scrapy',
-            'raise_on_warnings': True
-        }
+    def __init__(host, port):
+        self.namenode_host = host
+        self.namenode_port = port
 
     def open_spider(self, spider):
-        self.connection = mysql.connector.connect(**(self.database_config))
+        temp = tempfile.TemporaryFile()
+        self.temp = temp
 
     def close_spider(self, spider):
-        self.connection.close()
+        url = "http://{}:{:d}/webhdfs/v1/zxy".format(self.namenode_host, self.namenode_port)
+        params = {
+            'user.name': 'root',
+            'op': 'CREATE',
+            'overwrite': 'true'
+        }
+        response = requests.put(url, params=params, allow_redirects=False)
+        
+        if response.status_code == requests.codes['temporary_redirect']:
+            redirect_location = response.headers['Location']
+            requests.put(redirect_location, data=self.temp)
+        
+        self.temp.close()
+
+        # subprocess.call(['spark-submit', 'tfidf.py', '--py-files', 'jieba.zip'], shell=True)
 
     def process_item(self, item, spider):
-        cursor = self.connection.cursor()
-
-        item['id'] = str(uuid.uuid1()).replace('-', '')
-
-        sql = ("INSERT INTO blog "
-            "(id, url, title, content) "
-            "VALUES (%(id)s, %(url)s, %(title)s, %(content)s)")
-        cursor.execute(sql, {'id': item['id'], 'url': item['url'], 'title': item['title'], 'content': item['content']})
-        self.connection.commit()
-        cursor.close()
+        self.temp.write(item['content'].encode('utf-8'))
+        return item
