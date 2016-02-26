@@ -1,31 +1,42 @@
-# -*- coding: utf-8 -*-
-import scrapy
+from urlparse import urlparse
+import re
 
-from zhangxinyun_scrapy.items import ArticleItem
+from scrapy import Request
+from scrapy.spiders import XMLFeedSpider
+from bs4 import BeautifulSoup
 
-class InfoqSpider(scrapy.Spider):
-    name = "infoq"
-    allowed_domains = ["infoq.com"]
+from ..items import ArticleItem
 
-    def __init__(self, category=None, *args, **kwargs):
-        super(InfoqSpider, self).__init__(*args, **kwargs)
-        self.start_urls = ["http://www.infoq.com/cn/articles/"] + ["http://www.infoq.com/cn/articles/%d" % page_index for page_index in range(1, 20) if page_index % 12 == 0]
+class InfoQSpider(XMLFeedSpider):
+    name = 'infoq'
+    allowed_domains = ['infoq.com']
+    start_urls = ['http://www.infoq.com/cn/feed']
+    itertag = 'item'
 
-    def parse(self, response):
-        type1_article_href_array = response.css(".news_type1 > h2 > a::attr(href)").extract()
-        type2_article_href_array = response.css(".news_type2 > h2 > a::attr(href)").extract()
-        article_href_array = type1_article_href_array + type2_article_href_array
-        for article_href in article_href_array:
-            yield scrapy.Request("http://www.infoq.com" + article_href, callback=self.parse_article)
+    def parse_node(self, response, node):
+        item = ArticleItem()
+        item['title'] = node.xpath('title/text()').extract()[0]
+        item['date'] = node.xpath('pubDate/text()').extract()[0]
+        item['url'] = node.xpath('link/text()').extract()[0]
+
+        if urlparse(item['url']).path.startswith(('/cn/news', '/cn/articles')):
+            request = Request(url=item['url'], callback=self.parse_article)
+            request.meta['item'] = item
+            yield request
 
     def parse_article(self, response):
-        title = response.css("#content h1::text").extract()[0].strip()
+        item = response.meta['item']
+        body = BeautifulSoup(response.body, 'lxml')
 
-        #content = response.css("#content .text_content_container .text_info_article").extract()[0]
-        
-        article = ArticleItem()
-        article['url'] = response.url
-        article['title'] = title
-        #article['content'] = content
+        article_content = body.find('div', class_='text_info')
+        for script in article_content.find_all('script'):
+            script.extract()
+        for style in article_content.find_all('style'):
+            style.extract()
 
-        #yield article
+        content = article_content.get_text()
+        content = re.sub(re.compile('\s+'), '', content)
+
+        item['content'] = content
+
+        yield item
