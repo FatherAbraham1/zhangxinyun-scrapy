@@ -8,7 +8,7 @@
 import scrapy
 
 class ArticleItem(scrapy.Item):
-    id = scrapy.Field()
     url = scrapy.Field()
+    date = scrapy.Field()
     title = scrapy.Field()
     content = scrapy.Field()
