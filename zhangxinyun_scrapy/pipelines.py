@@ -19,12 +19,12 @@ class SparkPipline(object):
 
         return cls(host, port)
 
-    def __init__(host, port):
+    def __init__(self, host, port):
         self.namenode_host = host
         self.namenode_port = port
 
     def open_spider(self, spider):
-        temp = tempfile.TemporaryFile()
+        temp = tempfile.TemporaryFile(mode='w+t')
         self.temp = temp
 
     def close_spider(self, spider):
@@ -38,7 +38,8 @@ class SparkPipline(object):
         
         if response.status_code == requests.codes['temporary_redirect']:
             redirect_location = response.headers['Location']
-            requests.put(redirect_location, data=self.temp)
+            self.temp.seek(0)
+            upload_response = requests.put(redirect_location, data=self.temp)
         
         self.temp.close()
 
@@ -46,4 +47,5 @@ class SparkPipline(object):
 
     def process_item(self, item, spider):
         self.temp.write(item['content'].encode('utf-8'))
+        self.temp.write('\n')
         return item
